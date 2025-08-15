@@ -1,0 +1,13 @@
+yt-dlp==2024.08.06
+openai-whisper @ git+https://github.com/openai/whisper.git
+torch==2.2.2
+torchaudio==2.2.2
+numpy==1.26.4
+pydub==0.25.1
+pysrt==1.1.2
+ffmpeg-python==0.2.0
+transformers==4.43.3
+protobuf<=3.20.3
+supabase==2.6.0
+python-dotenv==1.0.1
+scipy==1.12.0

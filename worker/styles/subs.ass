@@ -1,0 +1,13 @@
+[Script Info]
+ScriptType: v4.00+
+Collisions: Normal
+PlayResX: 1080
+PlayResY: 1920
+Timer: 100.0000
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Sub, Inter, 48, &H00FFFFFF, &H000000FF, &H00111111, &H64000000, 0, 0, 0, 0, 100, 100, 0, 0, 1, 4, 0, 2, 40, 40, 80, 1
+
+[Events]
+; ffmpeg will inject from .srt; this file mainly sets style defaults
