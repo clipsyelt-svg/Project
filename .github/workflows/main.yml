@@ -2,8 +2,16 @@ name: Clipper Worker
 
 on:
   schedule:
-    - cron: "*/10 * * * *"   # every 10 minutes
-  workflow_dispatch: {}
+    - cron: "*/10 * * * *"   # still runs every 10 min if you want
+  workflow_dispatch:
+    inputs:
+      stream_url:
+        description: "Paste a public VOD/stream URL (YouTube/Twitch/Kick)"
+        required: true
+      max_clips:
+        description: "Max 60s clips to produce (default 4-6 is good for CPU)"
+        required: false
+        default: "4"
 
 jobs:
   run:
@@ -11,22 +19,28 @@ jobs:
     timeout-minutes: 55
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
       - name: Install system deps
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg
+
       - name: Install Python deps
         working-directory: worker
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
       - name: Run worker
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          STREAM_URL: ${{ github.event.inputs.stream_url }}
+          MAX_CLIPS: ${{ github.event.inputs.max_clips }}
         working-directory: worker
         run: python main.py
