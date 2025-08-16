@@ -2,7 +2,7 @@ name: Clipper Worker
 
 on:
   schedule:
-    - cron: "*/10 * * * *"   # still runs every 10 min if you want
+    - cron: "*/10 * * * *"
   workflow_dispatch:
     inputs:
       stream_url:
@@ -17,6 +17,7 @@ jobs:
   run:
     runs-on: ubuntu-latest
     timeout-minutes: 55
+
     steps:
       - uses: actions/checkout@v4
 
@@ -36,7 +37,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run worker
+      # Validate required input when manually dispatched
+      - name: Validate inputs (manual runs)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          if [ -z "${{ github.event.inputs.stream_url }}" ]; then
+            echo "ERROR: stream_url input is required for workflow_dispatch runs." >&2
+            exit 1
+          fi
+
+      # Manual (single-URL) mode
+      - name: Run worker (manual single-URL)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -44,3 +56,16 @@ jobs:
           MAX_CLIPS: ${{ github.event.inputs.max_clips }}
         working-directory: worker
         run: python main.py
+
+      # Scheduled (queue) mode — adjust the command/flag to match your script
+      - name: Run worker (scheduled queue)
+        if: ${{ github.event_name == 'schedule' }}
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        working-directory: worker
+        run: |
+          # If your script supports a queue/polling mode, call it here:
+          # python main.py --queue
+          # Otherwise, exit cleanly to avoid red Xs until queue mode is built:
+          echo "Scheduled run: no queue mode implemented yet. Exiting 0."
